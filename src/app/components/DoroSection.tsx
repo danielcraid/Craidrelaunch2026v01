@@ -2,17 +2,53 @@ import { motion } from "motion/react";
 import { MessageCircle, Zap, Clock, ArrowRight } from "lucide-react";
 import stageImg from "../../assets/5f9f5f798f588c543ad95786bc1e5d414a6ae817.png";
 import { useLanguage } from "./LanguageContext";
+import { useSanityModule } from "../../lib/useSanityModule";
+import { urlFor } from "../../lib/sanity";
 
 const FONT = "'DM Sans', sans-serif";
 
-export function DoroSection() {
-  const { t } = useLanguage();
+const iconMap: Record<string, any> = { MessageCircle, Zap, Clock };
 
-  const features = [
+export function DoroSection() {
+  const { t, lang } = useLanguage();
+  const { data: cms } = useSanityModule("doroModule");
+
+  if (cms && cms.enabled === false) return null;
+
+  const overline = cms?.overline?.[lang] || t("doro.overline");
+  const h2Line1 = (lang === "de" ? cms?.headline?.line1_de : cms?.headline?.line1_en) || t("doro.h2.1");
+  const h2Line2 = (lang === "de" ? cms?.headline?.line2_de : cms?.headline?.line2_en) || t("doro.h2.2");
+  const subtext = cms?.subtext?.[lang] || t("doro.sub");
+  const ctaText = (lang === "de" ? cms?.cta?.label_de : cms?.cta?.label_en) || t("doro.cta");
+  const ctaUrl = cms?.cta?.url || "https://office.craid.de";
+
+  const fallbackFeatures = [
     { icon: MessageCircle, text: t("doro.feat1") },
     { icon: Clock, text: t("doro.feat2") },
     { icon: Zap, text: t("doro.feat3") },
   ];
+
+  const features = cms?.features
+    ? cms.features.map((f: any) => ({
+        icon: iconMap[f.iconName] || MessageCircle,
+        text: lang === "de" ? f.text_de : f.text_en,
+      }))
+    : fallbackFeatures;
+
+  const fallbackChat = [
+    { sender: "doro", text: t("doro.chat1") },
+    { sender: "user", text: t("doro.chat2") },
+    { sender: "doro", text: t("doro.chat3") },
+  ];
+
+  const chatMessages = cms?.chatMessages
+    ? cms.chatMessages.map((m: any) => ({
+        sender: m.sender,
+        text: lang === "de" ? m.text_de : m.text_en,
+      }))
+    : fallbackChat;
+
+  const bgImage = cms?.backgroundImage ? urlFor(cms.backgroundImage).width(800).url() : stageImg;
 
   return (
     <section id="doro" className="py-32 relative overflow-hidden">
@@ -37,25 +73,25 @@ export function DoroSection() {
               className="text-primary text-[0.8rem] tracking-widest uppercase mb-4 block"
               style={{ fontFamily: FONT }}
             >
-              {t("doro.overline")}
+              {overline}
             </span>
             <h2
               className="text-[2.5rem] md:text-[3.5rem] leading-[1.1] mb-6"
               style={{ fontFamily: FONT, fontWeight: 700 }}
             >
-              {t("doro.h2.1")}
+              {h2Line1}
               <br />
-              <span className="text-muted-foreground">{t("doro.h2.2")}</span>
+              <span className="text-muted-foreground">{h2Line2}</span>
             </h2>
             <p
               className="text-muted-foreground text-[1.05rem] leading-relaxed mb-8 max-w-lg"
               style={{ fontFamily: FONT, fontWeight: 300 }}
             >
-              {t("doro.sub")}
+              {subtext}
             </p>
 
             <div className="space-y-4 mb-10">
-              {features.map((item) => (
+              {features.map((item: any) => (
                 <div key={item.text} className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <item.icon className="text-primary" size={16} />
@@ -71,13 +107,13 @@ export function DoroSection() {
             </div>
 
             <a
-              href="https://office.craid.de"
+              href={ctaUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-3.5 rounded-full text-[1rem] hover:opacity-90 transition-all hover:scale-105 group"
               style={{ fontFamily: FONT, fontWeight: 600 }}
             >
-              {t("doro.cta")}
+              {ctaText}
               <ArrowRight
                 size={18}
                 className="group-hover:translate-x-1 transition-transform"
@@ -94,7 +130,7 @@ export function DoroSection() {
             className="relative"
           >
             <div className="absolute -inset-8 opacity-30 pointer-events-none rounded-3xl overflow-hidden">
-              <img src={stageImg} alt="" className="w-full h-full object-cover" />
+              <img src={bgImage} alt="" className="w-full h-full object-cover" />
             </div>
 
             <div className="relative bg-card/90 backdrop-blur-sm border border-border rounded-2xl p-6 md:p-8">
@@ -117,75 +153,53 @@ export function DoroSection() {
 
               {/* Chat simulation */}
               <div className="space-y-4">
-                {/* Doro message */}
-                <motion.div
-                  className="flex gap-3"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/30">
-                    <span
-                      className="text-primary text-[0.7rem]"
-                      style={{ fontFamily: FONT, fontWeight: 700 }}
+                {chatMessages.map((msg: any, i: number) => (
+                  msg.sender === "doro" ? (
+                    <motion.div
+                      key={i}
+                      className="flex gap-3"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5 + i * 0.3 }}
                     >
-                      D
-                    </span>
-                  </div>
-                  <div className="bg-secondary/50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
-                    <p
-                      className="text-[0.85rem] text-foreground/90 leading-relaxed"
-                      style={{ fontFamily: FONT, fontWeight: 400 }}
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/30">
+                        <span
+                          className="text-primary text-[0.7rem]"
+                          style={{ fontFamily: FONT, fontWeight: 700 }}
+                        >
+                          D
+                        </span>
+                      </div>
+                      <div className="bg-secondary/50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
+                        <p
+                          className="text-[0.85rem] text-foreground/90 leading-relaxed"
+                          style={{ fontFamily: FONT, fontWeight: 400 }}
+                        >
+                          {msg.text}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={i}
+                      className="flex gap-3 justify-end"
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.5 + i * 0.3 }}
                     >
-                      {t("doro.chat1")}
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* User message */}
-                <motion.div
-                  className="flex gap-3 justify-end"
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <div className="bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-3 max-w-sm">
-                    <p
-                      className="text-[0.85rem] text-foreground/90 leading-relaxed"
-                      style={{ fontFamily: FONT, fontWeight: 400 }}
-                    >
-                      {t("doro.chat2")}
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Doro response */}
-                <motion.div
-                  className="flex gap-3"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 1.1 }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/30">
-                    <span
-                      className="text-primary text-[0.7rem]"
-                      style={{ fontFamily: FONT, fontWeight: 700 }}
-                    >
-                      D
-                    </span>
-                  </div>
-                  <div className="bg-secondary/50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
-                    <p
-                      className="text-[0.85rem] text-foreground/90 leading-relaxed"
-                      style={{ fontFamily: FONT, fontWeight: 400 }}
-                    >
-                      {t("doro.chat3")}
-                    </p>
-                  </div>
-                </motion.div>
+                      <div className="bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm px-4 py-3 max-w-sm">
+                        <p
+                          className="text-[0.85rem] text-foreground/90 leading-relaxed"
+                          style={{ fontFamily: FONT, fontWeight: 400 }}
+                        >
+                          {msg.text}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )
+                ))}
 
                 {/* Typing indicator */}
                 <motion.div
@@ -193,7 +207,7 @@ export function DoroSection() {
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 1.4 }}
+                  transition={{ delay: 0.5 + chatMessages.length * 0.3 }}
                 >
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 border border-primary/30">
                     <span

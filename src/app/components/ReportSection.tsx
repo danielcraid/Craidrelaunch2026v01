@@ -2,11 +2,24 @@ import { motion } from "motion/react";
 import { FileText, ArrowUpRight } from "lucide-react";
 import cloudImg from "../../assets/ca5f12215191bc21daacb9ee25a985b9cc1e9b5f.png";
 import { useLanguage } from "./LanguageContext";
+import { useSanityModule } from "../../lib/useSanityModule";
+import { urlFor } from "../../lib/sanity";
 
 const FONT = "'DM Sans', sans-serif";
 
 export function ReportSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { data: cms } = useSanityModule("reportModule");
+
+  if (cms && cms.enabled === false) return null;
+
+  const overline = cms?.overline?.[lang] || t("report.overline");
+  const h2Line1 = (lang === "de" ? cms?.headline?.line1_de : cms?.headline?.line1_en) || t("report.h2.1");
+  const h2Line2 = (lang === "de" ? cms?.headline?.line2_de : cms?.headline?.line2_en) || t("report.h2.2");
+  const subtext = cms?.subtext?.[lang] || t("report.sub");
+  const ctaText = (lang === "de" ? cms?.cta?.label_de : cms?.cta?.label_en) || t("report.cta");
+  const ctaUrl = cms?.cta?.url || "https://docs.craid.de";
+  const image = cms?.image ? urlFor(cms.image).width(1200).url() : cloudImg;
 
   return (
     <section id="report" className="py-32 relative">
@@ -21,7 +34,7 @@ export function ReportSection() {
           <div className="grid lg:grid-cols-2">
             <div className="h-64 lg:h-auto relative">
               <img
-                src={cloudImg}
+                src={image}
                 alt="Abstract visualization"
                 className="w-full h-full object-cover"
               />
@@ -38,7 +51,7 @@ export function ReportSection() {
                   className="text-primary text-[0.8rem] tracking-widest uppercase"
                   style={{ fontFamily: FONT }}
                 >
-                  {t("report.overline")}
+                  {overline}
                 </span>
               </div>
 
@@ -46,10 +59,10 @@ export function ReportSection() {
                 className="text-[2rem] md:text-[2.5rem] leading-[1.15] mb-4"
                 style={{ fontFamily: FONT, fontWeight: 700 }}
               >
-                {t("report.h2.1")}
+                {h2Line1}
                 <br />
                 <span className="text-muted-foreground">
-                  {t("report.h2.2")}
+                  {h2Line2}
                 </span>
               </h2>
 
@@ -57,17 +70,17 @@ export function ReportSection() {
                 className="text-muted-foreground text-[0.95rem] leading-relaxed mb-8"
                 style={{ fontFamily: FONT, fontWeight: 300 }}
               >
-                {t("report.sub")}
+                {subtext}
               </p>
 
               <a
-                href="https://docs.craid.de"
+                href={ctaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-3.5 rounded-full text-[1rem] hover:opacity-90 transition-all hover:scale-105 w-fit group"
                 style={{ fontFamily: FONT, fontWeight: 600 }}
               >
-                {t("report.cta")}
+                {ctaText}
                 <ArrowUpRight
                   size={18}
                   className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"

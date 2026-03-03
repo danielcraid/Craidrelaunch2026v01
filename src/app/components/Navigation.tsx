@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, Globe } from "lucide-react";
 import { useLanguage } from "./LanguageContext";
+import { useSanityModule } from "../../lib/useSanityModule";
+import { urlFor } from "../../lib/sanity";
 
 const FONT = "'DM Sans', sans-serif";
 
@@ -11,14 +13,28 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { lang, setLang, t } = useLanguage();
+  const { data: cms } = useSanityModule("navigationModule");
 
-  const navLinks = [
+  const fallbackLinks = [
     { label: t("nav.philosophy"), href: "#philosophy" },
     { label: t("nav.services"), href: "#services" },
     { label: t("nav.team"), href: "#team" },
     { label: t("nav.doro"), href: "#doro" },
     { label: t("nav.report"), href: "#report" },
   ];
+
+  const navLinks = cms?.links
+    ? cms.links.map((link: any) => ({
+        label: lang === "de" ? link.label_de : link.label_en,
+        href: link.href,
+      }))
+    : fallbackLinks;
+
+  const ctaLabel = (lang === "de" ? cms?.cta?.label_de : cms?.cta?.label_en) || t("nav.cta");
+  const ctaUrl = cms?.cta?.url || "https://office.craid.de";
+
+  const logo = cms?.logo ? urlFor(cms.logo).height(48).url() : logoImg;
+  const icon = cms?.iconMark ? urlFor(cms.iconMark).height(48).url() : iconMark;
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60);
@@ -41,13 +57,13 @@ export function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <a href="#" className="flex items-center gap-2">
-          <img src={iconMark} alt="" className="h-6" />
-          <img src={logoImg} alt="CRAiD" className="h-6 invert" />
+          <img src={icon} alt="" className="h-6" />
+          <img src={logo} alt="CRAiD" className="h-6 invert" />
         </a>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link: any) => (
             <a
               key={link.href}
               href={link.href}
@@ -69,13 +85,13 @@ export function Navigation() {
           </button>
 
           <a
-            href="https://office.craid.de"
+            href={ctaUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-[0.85rem] hover:opacity-90 transition-opacity"
             style={{ fontFamily: FONT, fontWeight: 600 }}
           >
-            {t("nav.cta")}
+            {ctaLabel}
           </a>
         </div>
 
@@ -98,7 +114,7 @@ export function Navigation() {
             className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border overflow-hidden"
           >
             <div className="px-6 py-6 flex flex-col gap-4">
-              {navLinks.map((link) => (
+              {navLinks.map((link: any) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -121,13 +137,13 @@ export function Navigation() {
               </button>
 
               <a
-                href="https://office.craid.de"
+                href={ctaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-primary text-primary-foreground px-5 py-3 rounded-full text-[0.875rem] text-center hover:opacity-90 transition-opacity mt-2"
                 style={{ fontFamily: FONT, fontWeight: 600 }}
               >
-                {t("nav.cta")}
+                {ctaLabel}
               </a>
             </div>
           </motion.div>

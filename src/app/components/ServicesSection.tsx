@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { ArrowUpRight, TrendingUp, ShieldMinus, HeartHandshake, Gauge } from "lucide-react";
 import { useLanguage } from "./LanguageContext";
+import { useSanityModule } from "../../lib/useSanityModule";
 
 const FONT = "'DM Sans', sans-serif";
 
@@ -12,47 +13,36 @@ const valueDrivers = [
 ];
 
 export function ServicesSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { data: cms } = useSanityModule("servicesModule");
 
-  const services = [
-    {
-      number: "01",
-      title: t("svc.01.title"),
-      description: t("svc.01.desc"),
-      tags: ["Strategy", "Assessment", "Roadmapping", "Workshops"],
-      outcomes: t("svc.01.outcomes"),
-    },
-    {
-      number: "02",
-      title: t("svc.02.title"),
-      description: t("svc.02.desc"),
-      tags: ["Experience Design", "Service Design", "Value-Based Outcomes"],
-      outcomes: t("svc.02.outcomes"),
-      hasValueDrivers: true,
-    },
-    {
-      number: "03",
-      title: t("svc.03.title"),
-      description: t("svc.03.desc"),
-      tags: ["Coaching", "Design Ops", "Ways of Working", "Agile"],
-      outcomes: t("svc.03.outcomes"),
-    },
-    {
-      number: "04",
-      title: t("svc.04.title"),
-      description: t("svc.04.desc"),
-      tags: ["Value-Based Delivery", "Co-Creation", "Prototyping", "Production"],
-      outcomes: t("svc.04.outcomes"),
-      isDeliveryFactory: true,
-    },
-    {
-      number: "05",
-      title: t("svc.05.title"),
-      description: t("svc.05.desc"),
-      tags: ["Brand Strategy", "Storytelling", "Marketing", "Communications"],
-      outcomes: t("svc.05.outcomes"),
-    },
+  if (cms && cms.enabled === false) return null;
+
+  const overline = cms?.overline?.[lang] || t("svc.overline");
+  const h2Line1 = (lang === "de" ? cms?.headline?.line1_de : cms?.headline?.line1_en) || t("svc.h2.1");
+  const h2Line2 = (lang === "de" ? cms?.headline?.line2_de : cms?.headline?.line2_en) || t("svc.h2.2");
+  const subtext = cms?.subtext?.[lang] || t("svc.sub");
+
+  const fallbackServices = [
+    { number: "01", title: t("svc.01.title"), description: t("svc.01.desc"), tags: ["Strategy", "Assessment", "Roadmapping", "Workshops"], outcomes: t("svc.01.outcomes") },
+    { number: "02", title: t("svc.02.title"), description: t("svc.02.desc"), tags: ["Experience Design", "Service Design", "Value-Based Outcomes"], outcomes: t("svc.02.outcomes"), hasValueDrivers: true },
+    { number: "03", title: t("svc.03.title"), description: t("svc.03.desc"), tags: ["Coaching", "Design Ops", "Ways of Working", "Agile"], outcomes: t("svc.03.outcomes") },
+    { number: "04", title: t("svc.04.title"), description: t("svc.04.desc"), tags: ["Value-Based Delivery", "Co-Creation", "Prototyping", "Production"], outcomes: t("svc.04.outcomes"), isDeliveryFactory: true },
+    { number: "05", title: t("svc.05.title"), description: t("svc.05.desc"), tags: ["Brand Strategy", "Storytelling", "Marketing", "Communications"], outcomes: t("svc.05.outcomes") },
   ];
+
+  const services = cms?.services
+    ? cms.services.map((svc: any) => ({
+        number: svc.number,
+        title: lang === "de" ? svc.title_de : svc.title_en,
+        description: lang === "de" ? svc.description_de : svc.description_en,
+        tags: svc.tags || [],
+        outcomes: lang === "de" ? svc.outcomes_de : svc.outcomes_en,
+        badge: svc.badge,
+        isDeliveryFactory: svc.isHighlighted,
+        hasValueDrivers: svc.number === "02",
+      }))
+    : fallbackServices;
 
   return (
     <section id="services" className="py-32 relative">
@@ -75,15 +65,15 @@ export function ServicesSection() {
             className="text-primary text-[0.8rem] tracking-widest uppercase mb-4 block"
             style={{ fontFamily: FONT }}
           >
-            {t("svc.overline")}
+            {overline}
           </span>
           <h2
             className="text-[2.5rem] md:text-[3.5rem] leading-[1.1] max-w-3xl"
             style={{ fontFamily: FONT, fontWeight: 700 }}
           >
-            {t("svc.h2.1")}
+            {h2Line1}
             <br />
-            <span className="text-muted-foreground">{t("svc.h2.2")}</span>
+            <span className="text-muted-foreground">{h2Line2}</span>
           </h2>
         </motion.div>
 
@@ -95,11 +85,11 @@ export function ServicesSection() {
           className="text-muted-foreground text-[1.05rem] leading-relaxed max-w-2xl mb-20"
           style={{ fontFamily: FONT, fontWeight: 300 }}
         >
-          {t("svc.sub")}
+          {subtext}
         </motion.p>
 
         <div className="space-y-0">
-          {services.map((service, index) => (
+          {services.map((service: any, index: number) => (
             <motion.div
               key={service.number}
               initial={{ opacity: 0, y: 30 }}
@@ -130,9 +120,9 @@ export function ServicesSection() {
                       style={{ fontFamily: FONT, fontWeight: 600 }}
                     >
                       {service.title}
-                      {service.isDeliveryFactory && (
+                      {service.badge && (
                         <span className="ml-3 text-[0.7rem] tracking-widest uppercase text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full align-middle">
-                          {t("svc.04.badge")}
+                          {service.badge}
                         </span>
                       )}
                     </h3>
@@ -148,7 +138,6 @@ export function ServicesSection() {
                     {service.description}
                   </p>
 
-                  {/* Value Drivers for Service 02 */}
                   {service.hasValueDrivers && (
                     <div className="flex flex-wrap gap-3 mb-5">
                       {valueDrivers.map((driver) => (
@@ -168,9 +157,8 @@ export function ServicesSection() {
                     </div>
                   )}
 
-                  {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {service.tags.map((tag) => (
+                    {service.tags.map((tag: string) => (
                       <span
                         key={tag}
                         className="text-[0.75rem] text-muted-foreground border border-border rounded-full px-3 py-1 tracking-wide"
@@ -181,7 +169,6 @@ export function ServicesSection() {
                     ))}
                   </div>
 
-                  {/* Outcomes */}
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <span
                       className="text-[0.75rem] text-muted-foreground/60 tracking-wide uppercase"
@@ -189,7 +176,7 @@ export function ServicesSection() {
                     >
                       {t("svc.outcomes.label")}
                     </span>
-                    {service.outcomes.split(", ").map((outcome, i, arr) => (
+                    {service.outcomes?.split(", ").map((outcome: string, i: number, arr: string[]) => (
                       <span key={outcome}>
                         <span
                           className="text-[0.8rem] text-foreground/70"

@@ -2,6 +2,8 @@ import { motion } from "motion/react";
 import { Linkedin, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useLanguage } from "./LanguageContext";
+import { useSanityModule } from "../../lib/useSanityModule";
+import { urlFor } from "../../lib/sanity";
 
 import avatarDoro from "../../assets/d9bc25ba5d246d2f99502b600d23667d63cbd0dd.png";
 import avatarBrandon from "../../assets/c307fc8c087b6a8a4f566a7291dc78bf1a142e57.png";
@@ -13,14 +15,14 @@ import avatarPace from "../../assets/993ce9daba546263b3bc104d10dbbe1d5a33f83d.pn
 
 const FONT = "'DM Sans', sans-serif";
 
-const founder = {
+const fallbackFounder = {
   name: "Daniel Simon",
   image:
     "https://images.unsplash.com/photo-1758691736975-9f7f643d178e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZWFtJTIwY29sbGFib3JhdGlvbiUyMG1vZGVybiUyMGRpdmVyc2V8ZW58MXx8fHwxNzcyNDA3ODk5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
   linkedin: "https://www.linkedin.com/in/danielsimon1",
 };
 
-const agentKeys = [
+const fallbackAgents = [
   { name: "Doro", role: "Chief of Staff", avatar: avatarDoro, taskKey: "team.doro.task" },
   { name: "Brandon", role: "Beratung", avatar: avatarBrandon, taskKey: "team.brandon.task" },
   { name: "Carlo", role: "Design Research", avatar: avatarCarlo, taskKey: "team.carlo.task" },
@@ -32,12 +34,49 @@ const agentKeys = [
 ];
 
 export function TeamSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { data: cms } = useSanityModule("teamModule");
+
+  if (cms && cms.enabled === false) return null;
+
+  const overline = cms?.overline?.[lang] || t("team.overline");
+  const h2Line1 = (lang === "de" ? cms?.headline?.line1_de : cms?.headline?.line1_en) || t("team.h2.1");
+  const h2Line2 = (lang === "de" ? cms?.headline?.line2_de : cms?.headline?.line2_en) || t("team.h2.2");
+  const subtext = cms?.subtext?.[lang] || t("team.sub");
+
+  const founder = cms?.founder
+    ? {
+        name: cms.founder.name,
+        role: lang === "de" ? cms.founder.role_de : cms.founder.role_en,
+        image: cms.founder.image ? urlFor(cms.founder.image).width(800).url() : fallbackFounder.image,
+        linkedin: cms.founder.linkedin,
+      }
+    : { ...fallbackFounder, role: t("team.founder.role") };
+
+  const agentsLabel = cms?.agentsLabel?.[lang] || t("team.agents.label");
+
+  const agents = cms?.agents
+    ? cms.agents.map((agent: any) => ({
+        name: agent.name,
+        role: agent.role,
+        task: lang === "de" ? agent.task_de : agent.task_en,
+        avatar: agent.avatar ? urlFor(agent.avatar).width(80).url() : null,
+      }))
+    : fallbackAgents.map((a) => ({
+        name: a.name,
+        role: a.role,
+        task: t(a.taskKey),
+        avatar: a.avatar,
+      }));
+
+  const bottomLine1 = (lang === "de" ? cms?.bottomText?.line1_de : cms?.bottomText?.line1_en) || t("team.bottom");
+  const bottomLine2 = (lang === "de" ? cms?.bottomText?.line2_de : cms?.bottomText?.line2_en) || t("team.bottom.2");
+  const bottomCta = (lang === "de" ? cms?.bottomText?.cta_de : cms?.bottomText?.cta_en) || t("team.bottom.cta");
+  const bottomEmail = cms?.bottomText?.email || "hello@craid.de";
 
   return (
     <section id="team" className="py-32 relative">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -49,15 +88,15 @@ export function TeamSection() {
             className="text-primary text-[0.8rem] tracking-widest uppercase mb-4 block"
             style={{ fontFamily: FONT }}
           >
-            {t("team.overline")}
+            {overline}
           </span>
           <h2
             className="text-[2.5rem] md:text-[3.5rem] leading-[1.1] max-w-4xl"
             style={{ fontFamily: FONT, fontWeight: 700 }}
           >
-            {t("team.h2.1")}
+            {h2Line1}
             <br />
-            <span className="text-muted-foreground">{t("team.h2.2")}</span>
+            <span className="text-muted-foreground">{h2Line2}</span>
           </h2>
         </motion.div>
 
@@ -69,10 +108,10 @@ export function TeamSection() {
           className="text-muted-foreground text-[1.05rem] leading-relaxed max-w-2xl mb-20"
           style={{ fontFamily: FONT, fontWeight: 300 }}
         >
-          {t("team.sub")}
+          {subtext}
         </motion.p>
 
-        {/* Founder - featured card */}
+        {/* Founder */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -110,7 +149,7 @@ export function TeamSection() {
                     className="text-primary text-[0.9rem]"
                     style={{ fontFamily: FONT }}
                   >
-                    {t("team.founder.role")}
+                    {founder.role}
                   </p>
                 </div>
                 <a
@@ -126,7 +165,7 @@ export function TeamSection() {
           </div>
         </motion.div>
 
-        {/* Agents - behind the scenes framing */}
+        {/* Agents label */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -138,20 +177,20 @@ export function TeamSection() {
             className="text-[0.85rem] text-muted-foreground tracking-widest uppercase"
             style={{ fontFamily: FONT }}
           >
-            {t("team.agents.label")}
+            {agentsLabel}
           </span>
           <div className="flex-1 h-px bg-border" />
           <span
             className="text-[0.8rem] text-muted-foreground"
             style={{ fontFamily: FONT }}
           >
-            {agentKeys.length} {t("team.agents.count")}
+            {agents.length} {t("team.agents.count")}
           </span>
         </motion.div>
 
         {/* Agents grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {agentKeys.map((agent, index) => (
+          {agents.map((agent: any, index: number) => (
             <motion.div
               key={agent.name}
               initial={{ opacity: 0, y: 30 }}
@@ -199,7 +238,7 @@ export function TeamSection() {
                 className="text-muted-foreground text-[0.8rem] leading-relaxed"
                 style={{ fontFamily: FONT, fontWeight: 300 }}
               >
-                {t(agent.taskKey)}
+                {agent.task}
               </p>
 
               <div className="flex items-center gap-1.5 mt-3">
@@ -224,14 +263,14 @@ export function TeamSection() {
           className="text-center text-muted-foreground mt-16 text-[0.95rem]"
           style={{ fontFamily: FONT, fontWeight: 300 }}
         >
-          {t("team.bottom")}
+          {bottomLine1}
           <br className="hidden md:block" />
-          {t("team.bottom.2")}{" "}
+          {bottomLine2}{" "}
           <a
-            href="mailto:hello@craid.de"
+            href={`mailto:${bottomEmail}`}
             className="text-primary hover:underline"
           >
-            {t("team.bottom.cta")}
+            {bottomCta}
           </a>
         </motion.p>
       </div>
