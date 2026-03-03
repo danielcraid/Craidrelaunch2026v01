@@ -38,7 +38,7 @@ export function HeroSection() {
   // Background settings from CMS
   const bgType = cms?.backgroundType || "image";
   const bgImage = cms?.backgroundImage ? urlFor(cms.backgroundImage).url() : stageImg;
-  const bgVideo = cms?.backgroundVideo || (cms?.backgroundVideoFile ? cms.backgroundVideoFile.asset?.url : null);
+  const bgVideo = cms?.backgroundVideo || cms?.backgroundVideoFileUrl || null;
   const overlayColor = cms?.overlayColor || "#0a0a0f";
   const overlayOpacity = cms?.overlayOpacity != null ? cms.overlayOpacity / 100 : 0.7;
   const cloudImage = cms?.cloudImage ? urlFor(cms.cloudImage).url() : cloudBgImg;

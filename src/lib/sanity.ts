@@ -35,6 +35,15 @@ export async function fetchModules() {
 }
 
 // Fetch a single module by type
+// For heroModule, resolve file asset URLs (video uploads)
 export async function fetchModule(type: string) {
+  if (type === 'heroModule') {
+    return client.fetch(
+      `*[_type == "heroModule"][0]{
+        ...,
+        "backgroundVideoFileUrl": backgroundVideoFile.asset->url
+      }`
+    )
+  }
   return client.fetch(`*[_type == $type][0]`, { type })
 }
