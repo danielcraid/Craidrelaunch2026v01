@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { MessageCircle, Zap, Clock, ArrowRight } from "lucide-react";
-import stageImg from "figma:asset/5f9f5f798f588c543ad95786bc1e5d414a6ae817.png";
+import stageImg from "../../assets/5f9f5f798f588c543ad95786bc1e5d414a6ae817.png";
 import { useLanguage } from "./LanguageContext";
 
 const FONT = "'DM Sans', sans-serif";

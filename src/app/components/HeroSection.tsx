@@ -1,9 +1,9 @@
 import { motion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { ArrowDown } from "lucide-react";
-import iconImg from "figma:asset/bb546898d19b89ec63162bc8e936339380a7a402.png";
-import stageImg from "figma:asset/5f9f5f798f588c543ad95786bc1e5d414a6ae817.png";
-import cloudBgImg from "figma:asset/ca5f12215191bc21daacb9ee25a985b9cc1e9b5f.png";
+import iconImg from "../../assets/bb546898d19b89ec63162bc8e936339380a7a402.png";
+import stageImg from "../../assets/5f9f5f798f588c543ad95786bc1e5d414a6ae817.png";
+import cloudBgImg from "../../assets/ca5f12215191bc21daacb9ee25a985b9cc1e9b5f.png";
 import { useLanguage } from "./LanguageContext";
 
 const FONT = "'DM Sans', sans-serif";

@@ -3,13 +3,13 @@ import { Linkedin, User } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useLanguage } from "./LanguageContext";
 
-import avatarDoro from "figma:asset/d9bc25ba5d246d2f99502b600d23667d63cbd0dd.png";
-import avatarBrandon from "figma:asset/c307fc8c087b6a8a4f566a7291dc78bf1a142e57.png";
-import avatarCarlo from "figma:asset/88507faf095d37ad800576d0423c3ecd93e32a0b.png";
-import avatarMaja from "figma:asset/89f5a077a16c80d3865dba7beccdb601e04085a2.png";
-import avatarJason from "figma:asset/0929b8479cef06d31faab2d22c7a713acaed89ce.png";
-import avatarChris from "figma:asset/0c8b54a653f19357f35790120fe1c78ae178a6ab.png";
-import avatarPace from "figma:asset/993ce9daba546263b3bc104d10dbbe1d5a33f83d.png";
+import avatarDoro from "../../assets/d9bc25ba5d246d2f99502b600d23667d63cbd0dd.png";
+import avatarBrandon from "../../assets/c307fc8c087b6a8a4f566a7291dc78bf1a142e57.png";
+import avatarCarlo from "../../assets/88507faf095d37ad800576d0423c3ecd93e32a0b.png";
+import avatarMaja from "../../assets/89f5a077a16c80d3865dba7beccdb601e04085a2.png";
+import avatarJason from "../../assets/0929b8479cef06d31faab2d22c7a713acaed89ce.png";
+import avatarChris from "../../assets/0c8b54a653f19357f35790120fe1c78ae178a6ab.png";
+import avatarPace from "../../assets/993ce9daba546263b3bc104d10dbbe1d5a33f83d.png";
 
 const FONT = "'DM Sans', sans-serif";
 

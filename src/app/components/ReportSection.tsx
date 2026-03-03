@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { FileText, ArrowUpRight } from "lucide-react";
-import cloudImg from "figma:asset/ca5f12215191bc21daacb9ee25a985b9cc1e9b5f.png";
+import cloudImg from "../../assets/ca5f12215191bc21daacb9ee25a985b9cc1e9b5f.png";
 import { useLanguage } from "./LanguageContext";
 
 const FONT = "'DM Sans', sans-serif";

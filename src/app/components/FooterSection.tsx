@@ -1,5 +1,5 @@
 import { Linkedin, Mail, ArrowUpRight } from "lucide-react";
-import logoImg from "figma:asset/8c931104148342b81ad7ed00151d7a31ba7f5d6d.png";
+import logoImg from "../../assets/8c931104148342b81ad7ed00151d7a31ba7f5d6d.png";
 import { useLanguage } from "./LanguageContext";
 
 const FONT = "'DM Sans', sans-serif";

@@ -1,5 +1,5 @@
-import logoImg from "figma:asset/8c931104148342b81ad7ed00151d7a31ba7f5d6d.png";
-import iconMark from "figma:asset/8304bad1291bc3e85d2bca53c57be9bc971b86ea.png";
+import logoImg from "../../assets/8c931104148342b81ad7ed00151d7a31ba7f5d6d.png";
+import iconMark from "../../assets/8304bad1291bc3e85d2bca53c57be9bc971b86ea.png";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X, Globe } from "lucide-react";
